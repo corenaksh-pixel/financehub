@@ -4,12 +4,14 @@ class AppNumberField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
   final bool decimal;
+  final TextInputAction textInputAction;
 
   const AppNumberField({
     super.key,
     required this.controller,
     required this.label,
     this.decimal = false,
+    this.textInputAction = TextInputAction.next,
   });
 
   @override
@@ -21,11 +23,17 @@ class AppNumberField extends StatelessWidget {
         keyboardType: TextInputType.numberWithOptions(
           decimal: decimal,
         ),
+        textInputAction: textInputAction,
+        onTapOutside: (_) {
+          FocusScope.of(context).unfocus();
+        },
         decoration: InputDecoration(
           labelText: label,
-          border: const OutlineInputBorder(),
-          filled: true,
+          hintText: "Enter $label",
           prefixIcon: const Icon(Icons.calculate),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
         ),
       ),
     );

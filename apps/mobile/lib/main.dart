@@ -1,6 +1,11 @@
+import 'package:financehub/app/app.dart';
 import 'package:flutter/widgets.dart';
-import 'app/app.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const FinanceHubApp());
+  runApp(
+    const ProviderScope(
+      child: FinanceHubApp(),
+    ),
+  );
 }
