@@ -3,6 +3,7 @@ import 'package:financehub/features/gst/presentation/gst_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:financehub/features/sip/presentation/sip_screen.dart';
 import 'package:financehub/features/fd/presentation/fd_screen.dart';
+import 'package:financehub/features/rd/presentation/rd_screen.dart';
 
 class CalculatorsScreen extends StatelessWidget {
   const CalculatorsScreen({super.key});
@@ -20,7 +21,7 @@ class CalculatorsScreen extends StatelessWidget {
     },
     {"title": "SIP Calculator", "icon": Icons.trending_up, "implemented": true},
     {"title": "FD Calculator", "icon": Icons.savings, "implemented": true},
-    {"title": "RD Calculator", "icon": Icons.payments, "implemented": false},
+    {"title": "RD Calculator", "icon": Icons.payments, "implemented": true},
     {
       "title": "PPF Calculator",
       "icon": Icons.account_balance_wallet,
@@ -76,6 +77,13 @@ class CalculatorsScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const FdScreen()),
+                    );
+                    break;
+
+                  case "RD Calculator":
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const RdScreen()),
                     );
                     break;
 
