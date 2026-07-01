@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:financehub/features/sip/presentation/sip_screen.dart';
 import 'package:financehub/features/fd/presentation/fd_screen.dart';
 import 'package:financehub/features/rd/presentation/rd_screen.dart';
+import 'package:financehub/features/ppf/presentation/ppf_screen.dart';
+import 'package:financehub/features/income_tax/presentation/income_tax_screen.dart';
 
 class CalculatorsScreen extends StatelessWidget {
   const CalculatorsScreen({super.key});
@@ -25,12 +27,12 @@ class CalculatorsScreen extends StatelessWidget {
     {
       "title": "PPF Calculator",
       "icon": Icons.account_balance_wallet,
-      "implemented": false,
+      "implemented": true,
     },
     {
       "title": "Income Tax Calculator",
       "icon": Icons.calculate,
-      "implemented": false,
+      "implemented": true,
     },
   ];
 
@@ -84,6 +86,22 @@ class CalculatorsScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const RdScreen()),
+                    );
+                    break;
+
+                  case "PPF Calculator":
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const PpfScreen()),
+                    );
+                    break;
+
+                  case "Income Tax Calculator":
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const IncomeTaxScreen(),
+                      ),
                     );
                     break;
 
