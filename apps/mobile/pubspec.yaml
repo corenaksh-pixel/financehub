@@ -41,7 +41,9 @@ dependencies:
   logger: ^2.7.0
   google_fonts: ^8.1.0
   fl_chart: ^1.0.0
-  share_plus: ^13.2.0
+  share_plus: ^11.0.0
+  pdf: ^3.11.3
+  printing: ^5.14.2
 
 dev_dependencies:
   flutter_test:

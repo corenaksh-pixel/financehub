@@ -3,7 +3,7 @@ import 'package:financehub/features/emi/domain/emi_schedule.dart';
 import 'package:financehub/features/emi/domain/emi_share.dart';
 import 'package:financehub/features/emi/presentation/widgets/amortization_table.dart';
 import 'package:financehub/shared/widgets/app_number_field.dart';
-import 'package:financehub/shared/widgets/emi_pie_chart.dart';
+import 'package:financehub/features/emi/presentation/widgets/emi_pie_chart.dart';
 import 'package:financehub/shared/widgets/result_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -130,9 +130,7 @@ class _EmiScreenState extends State<EmiScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("EMI Calculator"),
-      ),
+      appBar: AppBar(title: const Text("EMI Calculator")),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: SingleChildScrollView(
@@ -219,9 +217,7 @@ class _EmiScreenState extends State<EmiScreen> {
 
                 const SizedBox(height: 24),
 
-                AmortizationTable(
-                  schedule: schedule,
-                ),
+                AmortizationTable(schedule: schedule),
               ],
             ],
           ),
