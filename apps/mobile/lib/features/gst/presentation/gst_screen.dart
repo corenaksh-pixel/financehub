@@ -74,6 +74,7 @@ class _GstScreenState extends State<GstScreen> {
     if (baseAmount == null) return;
 
     await ShareService.share(
+      context: context,
       title: "FinanceHub GST Calculation",
       data: {
         "Base Amount": formatter.format(baseAmount!),
@@ -97,9 +98,9 @@ class _GstScreenState extends State<GstScreen> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -112,9 +113,7 @@ class _GstScreenState extends State<GstScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("GST Calculator"),
-      ),
+      appBar: AppBar(title: const Text("GST Calculator")),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: SingleChildScrollView(
@@ -181,8 +180,7 @@ class _GstScreenState extends State<GstScreen> {
 
                   Expanded(
                     child: FilledButton.icon(
-                      onPressed:
-                          baseAmount == null ? null : share,
+                      onPressed: baseAmount == null ? null : share,
                       icon: const Icon(Icons.share),
                       label: const Text("Share"),
                     ),
@@ -192,8 +190,7 @@ class _GstScreenState extends State<GstScreen> {
 
                   Expanded(
                     child: FilledButton.icon(
-                      onPressed:
-                          baseAmount == null ? null : exportPdf,
+                      onPressed: baseAmount == null ? null : exportPdf,
                       icon: const Icon(Icons.picture_as_pdf),
                       label: const Text("PDF"),
                     ),
