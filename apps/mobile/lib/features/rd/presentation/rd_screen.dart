@@ -5,6 +5,7 @@ import 'package:financehub/shared/widgets/app_number_field.dart';
 import 'package:financehub/shared/widgets/result_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:financehub/core/services/history_service.dart';
 
 class RdScreen extends StatefulWidget {
   const RdScreen({super.key});
@@ -37,7 +38,7 @@ class _RdScreenState extends State<RdScreen> {
   double? interest;
   double? maturity;
 
-  void calculateRD() {
+  Future<void> calculateRD() async {
     FocusScope.of(context).unfocus();
 
     final deposit = double.tryParse(_depositController.text.trim());
@@ -71,6 +72,21 @@ class _RdScreenState extends State<RdScreen> {
       interest = result["interest"];
       maturity = result["maturity"];
     });
+
+    await HistoryService.save(
+      calculator: 'RD',
+      inputs: {
+        'Monthly Deposit': deposit,
+        'Interest Rate (%)': rate,
+        'Tenure (Months)': months,
+        'Compounding': selectedCompounding,
+      },
+      results: {
+        'Total Investment': invested!,
+        'Interest Earned': interest!,
+        'Maturity Amount': maturity!,
+      },
+    );
   }
 
   void resetCalculator() {
@@ -142,9 +158,7 @@ class _RdScreenState extends State<RdScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("RD Calculator"),
-      ),
+      appBar: AppBar(title: const Text("RD Calculator")),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: SingleChildScrollView(
@@ -178,10 +192,7 @@ class _RdScreenState extends State<RdScreen> {
                   border: OutlineInputBorder(),
                 ),
                 items: compoundingOptions.keys.map((value) {
-                  return DropdownMenuItem(
-                    value: value,
-                    child: Text(value),
-                  );
+                  return DropdownMenuItem(value: value, child: Text(value));
                 }).toList(),
                 onChanged: (value) {
                   setState(() {

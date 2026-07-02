@@ -5,6 +5,7 @@ import 'package:financehub/shared/widgets/app_number_field.dart';
 import 'package:financehub/shared/widgets/result_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:financehub/core/services/history_service.dart';
 
 class PpfScreen extends StatefulWidget {
   const PpfScreen({super.key});
@@ -28,15 +29,12 @@ class _PpfScreenState extends State<PpfScreen> {
   double? interest;
   double? maturity;
 
-  void calculatePPF() {
+  Future<void> calculatePPF() async {
     FocusScope.of(context).unfocus();
 
-    final investment =
-        double.tryParse(_investmentController.text.trim());
-    final rate =
-        double.tryParse(_rateController.text.trim());
-    final years =
-        int.tryParse(_yearsController.text.trim());
+    final investment = double.tryParse(_investmentController.text.trim());
+    final rate = double.tryParse(_rateController.text.trim());
+    final years = int.tryParse(_yearsController.text.trim());
 
     if (investment == null || investment <= 0) {
       _showError("Please enter a valid yearly investment.");
@@ -64,6 +62,19 @@ class _PpfScreenState extends State<PpfScreen> {
       interest = result["interest"];
       maturity = result["maturity"];
     });
+    await HistoryService.save(
+      calculator: 'PPF',
+      inputs: {
+        'Yearly Investment': investment,
+        'Interest Rate (%)': rate,
+        'Investment Period (Years)': years,
+      },
+      results: {
+        'Total Investment': invested!,
+        'Interest Earned': interest!,
+        'Maturity Amount': maturity!,
+      },
+    );
   }
 
   void resetCalculator() {
@@ -85,8 +96,9 @@ class _PpfScreenState extends State<PpfScreen> {
       context: context,
       title: 'FinanceHub PPF Calculation',
       data: {
-        'Yearly Investment':
-            formatter.format(double.parse(_investmentController.text)),
+        'Yearly Investment': formatter.format(
+          double.parse(_investmentController.text),
+        ),
         'Interest Earned': formatter.format(interest!),
         'Total Investment': formatter.format(invested!),
         'Maturity Amount': formatter.format(maturity!),
@@ -100,8 +112,9 @@ class _PpfScreenState extends State<PpfScreen> {
     await PdfService.generateReport(
       title: 'FinanceHub PPF Report',
       data: {
-        'Yearly Investment':
-            formatter.format(double.parse(_investmentController.text)),
+        'Yearly Investment': formatter.format(
+          double.parse(_investmentController.text),
+        ),
         'Interest Earned': formatter.format(interest!),
         'Total Investment': formatter.format(invested!),
         'Maturity Amount': formatter.format(maturity!),
@@ -132,9 +145,7 @@ class _PpfScreenState extends State<PpfScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("PPF Calculator"),
-      ),
+      appBar: AppBar(title: const Text("PPF Calculator")),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: SingleChildScrollView(

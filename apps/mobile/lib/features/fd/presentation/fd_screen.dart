@@ -5,6 +5,7 @@ import 'package:financehub/shared/widgets/app_number_field.dart';
 import 'package:financehub/shared/widgets/result_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:financehub/core/services/history_service.dart';
 
 class FdScreen extends StatefulWidget {
   const FdScreen({super.key});
@@ -37,7 +38,7 @@ class _FdScreenState extends State<FdScreen> {
   double? interest;
   double? maturity;
 
-  void calculateFD() {
+  Future<void> calculateFD() async {
     FocusScope.of(context).unfocus();
 
     final amount = double.tryParse(_principalController.text.trim());
@@ -71,6 +72,20 @@ class _FdScreenState extends State<FdScreen> {
       interest = result["interest"];
       maturity = result["maturity"];
     });
+    await HistoryService.save(
+      calculator: 'FD',
+      inputs: {
+        'Deposit Amount': amount,
+        'Interest Rate (%)': rate,
+        'Tenure (Years)': years,
+        'Compounding': selectedCompounding,
+      },
+      results: {
+        'Deposit Amount': principal!,
+        'Interest Earned': interest!,
+        'Maturity Amount': maturity!,
+      },
+    );
   }
 
   void resetCalculator() {

@@ -5,6 +5,7 @@ import 'package:financehub/shared/widgets/app_number_field.dart';
 import 'package:financehub/shared/widgets/result_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:financehub/core/services/history_service.dart';
 
 class SipScreen extends StatefulWidget {
   const SipScreen({super.key});
@@ -28,7 +29,7 @@ class _SipScreenState extends State<SipScreen> {
   double? estimatedReturns;
   double? maturityValue;
 
-  void calculateSIP() {
+  Future<void> calculateSIP() async {
     FocusScope.of(context).unfocus();
 
     final investment = double.tryParse(_investmentController.text.trim());
@@ -61,6 +62,19 @@ class _SipScreenState extends State<SipScreen> {
       estimatedReturns = result['estimatedReturns'];
       maturityValue = result['maturityValue'];
     });
+    await HistoryService.save(
+      calculator: 'SIP',
+      inputs: {
+        'Monthly Investment': investment,
+        'Expected Return (%)': annualReturn,
+        'Investment Period (Years)': years,
+      },
+      results: {
+        'Total Invested': investedAmount!,
+        'Estimated Returns': estimatedReturns!,
+        'Maturity Value': maturityValue!,
+      },
+    );
   }
 
   void resetCalculator() {
