@@ -6,6 +6,7 @@ import 'package:financehub/features/fd/presentation/fd_screen.dart';
 import 'package:financehub/features/rd/presentation/rd_screen.dart';
 import 'package:financehub/features/ppf/presentation/ppf_screen.dart';
 import 'package:financehub/features/income_tax/presentation/income_tax_screen.dart';
+import 'package:financehub/features/history/presentation/history_screen.dart';
 
 class CalculatorsScreen extends StatelessWidget {
   const CalculatorsScreen({super.key});
@@ -34,6 +35,7 @@ class CalculatorsScreen extends StatelessWidget {
       "icon": Icons.calculate,
       "implemented": true,
     },
+    {"title": "History", "icon": Icons.history, "implemented": true},
   ];
 
   @override
@@ -102,6 +104,13 @@ class CalculatorsScreen extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (_) => const IncomeTaxScreen(),
                       ),
+                    );
+                    break;
+
+                  case "History":
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HistoryScreen()),
                     );
                     break;
 

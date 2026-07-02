@@ -5,6 +5,7 @@ import 'package:financehub/shared/widgets/app_number_field.dart';
 import 'package:financehub/shared/widgets/result_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:financehub/core/services/history_service.dart';
 
 class GstScreen extends StatefulWidget {
   const GstScreen({super.key});
@@ -29,7 +30,7 @@ class _GstScreenState extends State<GstScreen> {
   double? gstAmount;
   double? finalAmount;
 
-  void calculateGST() {
+  Future<void> calculateGST() async {
     FocusScope.of(context).unfocus();
 
     final amount = double.tryParse(_amountController.text.trim());
@@ -56,6 +57,19 @@ class _GstScreenState extends State<GstScreen> {
       gstAmount = result["gstAmount"];
       finalAmount = result["finalAmount"];
     });
+    await HistoryService.save(
+      calculator: 'GST',
+      inputs: {
+        'Amount': amount,
+        'GST %': gst,
+        'Mode': isAddGst ? 'Add GST' : 'Remove GST',
+      },
+      results: {
+        'Base Amount': baseAmount!,
+        'GST Amount': gstAmount!,
+        'Final Amount': finalAmount!,
+      },
+    );
   }
 
   void reset() {

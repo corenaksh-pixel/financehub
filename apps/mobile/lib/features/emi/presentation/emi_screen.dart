@@ -7,6 +7,7 @@ import 'package:financehub/features/emi/presentation/widgets/emi_pie_chart.dart'
 import 'package:financehub/shared/widgets/result_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:financehub/core/services/history_service.dart';
 
 class EmiScreen extends StatefulWidget {
   const EmiScreen({super.key});
@@ -32,7 +33,7 @@ class _EmiScreenState extends State<EmiScreen> {
 
   List<EmiSchedule> schedule = [];
 
-  void calculateEMI() {
+  Future<void> calculateEMI() async {
     FocusScope.of(context).unfocus();
 
     final principal = double.tryParse(_loanController.text.trim());
@@ -82,6 +83,20 @@ class _EmiScreenState extends State<EmiScreen> {
       totalPayment = result["payment"];
       schedule = emiSchedule;
     });
+
+    await HistoryService.save(
+      calculator: 'EMI',
+      inputs: {
+        'Loan Amount': principal,
+        'Interest Rate': annualRate,
+        'Tenure (Years)': years,
+      },
+      results: {
+        'Monthly EMI': emi!,
+        'Total Interest': totalInterest!,
+        'Total Payment': totalPayment!,
+      },
+    );
   }
 
   void _showError(String message) {
