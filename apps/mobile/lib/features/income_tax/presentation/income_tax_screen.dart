@@ -7,6 +7,7 @@ import 'package:financehub/shared/widgets/app_number_field.dart';
 import 'package:financehub/shared/widgets/result_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:financehub/core/services/history_service.dart';
 
 class IncomeTaxScreen extends StatefulWidget {
   const IncomeTaxScreen({super.key});
@@ -26,7 +27,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
 
   TaxResult? result;
 
-  void calculate() {
+  Future<void> calculate() async {
     FocusScope.of(context).unfocus();
 
     final income = double.tryParse(_incomeController.text.trim());
@@ -41,6 +42,20 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
     setState(() {
       result = IncomeTaxCalculator.calculate(annualIncome: income);
     });
+
+    await HistoryService.save(
+      calculator: 'Income Tax',
+      inputs: {'Annual Income': income, 'Tax Regime': 'New Regime FY 2026-27'},
+      results: {
+        'Gross Income': result!.grossIncome,
+        'Standard Deduction': result!.standardDeduction,
+        'Taxable Income': result!.taxableIncome,
+        'Income Tax': result!.incomeTax,
+        'Health & Education Cess': result!.cess,
+        'Total Tax': result!.totalTax,
+        'Effective Tax Rate': '${result!.effectiveTaxRate.toStringAsFixed(2)}%',
+      },
+    );
   }
 
   void reset() {
