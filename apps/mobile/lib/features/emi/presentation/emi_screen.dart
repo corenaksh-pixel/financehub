@@ -1,6 +1,6 @@
 import 'package:financehub/features/emi/domain/emi_calculator.dart';
 import 'package:financehub/features/emi/domain/emi_schedule.dart';
-import 'package:financehub/features/emi/domain/emi_share.dart';
+import 'package:financehub/core/services/share_service.dart';
 import 'package:financehub/features/emi/presentation/widgets/amortization_table.dart';
 import 'package:financehub/shared/widgets/app_number_field.dart';
 import 'package:financehub/features/emi/presentation/widgets/emi_pie_chart.dart';
@@ -127,10 +127,19 @@ class _EmiScreenState extends State<EmiScreen> {
   Future<void> shareResult() async {
     if (emi == null) return;
 
-    await EmiShare.share(
-      emi: currencyFormatter.format(emi!),
-      interest: currencyFormatter.format(totalInterest!),
-      payment: currencyFormatter.format(totalPayment!),
+    await ShareService.share(
+      context: context,
+      title: 'FinanceHub EMI Calculation',
+      data: {
+        'Loan Amount': currencyFormatter.format(
+          double.parse(_loanController.text),
+        ),
+        'Interest Rate': '${_interestController.text}%',
+        'Loan Tenure': '${_tenureController.text} Years',
+        'Monthly EMI': currencyFormatter.format(emi!),
+        'Total Interest': currencyFormatter.format(totalInterest!),
+        'Total Payment': currencyFormatter.format(totalPayment!),
+      },
     );
   }
 

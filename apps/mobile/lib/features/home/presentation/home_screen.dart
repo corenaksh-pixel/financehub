@@ -3,6 +3,10 @@ import 'package:financehub/shared/widgets/calculator_card.dart';
 import 'package:financehub/shared/widgets/stat_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:financehub/features/home/presentation/widgets/recent_calculations_widget.dart';
+import 'package:financehub/features/calculators/domain/calculator_catalog.dart';
+import 'package:financehub/features/home/widgets/category_section.dart';
+import 'package:financehub/features/search/presentation/search_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -20,30 +24,35 @@ class HomeScreen extends ConsumerWidget {
             children: [
               const Text(
                 "👋 Good Evening",
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 8),
 
               const Text(
                 "Pratik",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.grey,
-                ),
+                style: TextStyle(fontSize: 18, color: Colors.grey),
               ),
 
               const SizedBox(height: 24),
 
-              TextField(
-                decoration: InputDecoration(
-                  hintText: "Search calculators...",
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
+              InkWell(
+                borderRadius: BorderRadius.circular(14),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SearchScreen()),
+                  );
+                },
+                child: IgnorePointer(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: "Search calculators...",
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -52,49 +61,54 @@ class HomeScreen extends ConsumerWidget {
 
               const Text(
                 "⭐ Popular Calculators",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 16),
 
-              GridView.count(
-                crossAxisCount: 2,
+              GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 1.2,
-                children: const [
-                  CalculatorCard(
-                    icon: Icons.account_balance,
-                    title: "EMI",
-                  ),
-                  CalculatorCard(
-                    icon: Icons.receipt_long,
-                    title: "GST",
-                  ),
-                  CalculatorCard(
-                    icon: Icons.trending_up,
-                    title: "SIP",
-                  ),
-                  CalculatorCard(
-                    icon: Icons.savings,
-                    title: "FD",
-                  ),
-                ],
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 0.75,
+                ),
+                itemCount: CalculatorCatalog.calculators.length,
+                itemBuilder: (context, index) {
+                  final calculator = CalculatorCatalog.calculators[index];
+
+                  return CalculatorCard(
+                    id: calculator.id,
+                    icon: calculator.icon,
+                    title: calculator.title,
+                    subtitle: calculator.subtitle,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => calculator.screen),
+                      );
+                    },
+                  );
+                },
               ),
+              const SizedBox(height: 30),
+
+              const Text(
+                "📂 Categories",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 16),
+
+              const CategorySection(),
 
               const SizedBox(height: 30),
 
               const Text(
                 "📊 Quick Overview",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 16),
@@ -104,7 +118,7 @@ class HomeScreen extends ConsumerWidget {
                   StatCard(
                     icon: Icons.calculate,
                     title: "Calculators",
-                    value: stats.calculators.toString(),
+                    value: CalculatorCatalog.calculators.length.toString(),
                   ),
                   const SizedBox(width: 12),
                   StatCard(
@@ -125,37 +139,12 @@ class HomeScreen extends ConsumerWidget {
 
               const Text(
                 "🕒 Recent Calculations",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 16),
 
-              Card(
-                child: ListTile(
-                  leading: const CircleAvatar(
-                    child: Icon(Icons.home),
-                  ),
-                  title: const Text("Home Loan EMI"),
-                  subtitle: const Text("₹ 8,678 / month"),
-                  trailing: const Icon(Icons.arrow_forward_ios),
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              Card(
-                child: ListTile(
-                  leading: const CircleAvatar(
-                    child: Icon(Icons.directions_car),
-                  ),
-                  title: const Text("Car Loan EMI"),
-                  subtitle: const Text("₹ 14,220 / month"),
-                  trailing: const Icon(Icons.arrow_forward_ios),
-                ),
-              ),
+              const RecentCalculationsWidget(),
             ],
           ),
         ),

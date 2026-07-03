@@ -24,12 +24,12 @@ class ShareService {
 
     final box = context.findRenderObject() as RenderBox?;
 
+    final origin = box != null
+        ? box.localToGlobal(Offset.zero) & box.size
+        : const Rect.fromLTWH(0, 0, 1, 1);
+
     await SharePlus.instance.share(
-      ShareParams(
-        text: buffer.toString(),
-        sharePositionOrigin:
-            box!.localToGlobal(Offset.zero) & box.size,
-      ),
+      ShareParams(text: buffer.toString(), sharePositionOrigin: origin),
     );
   }
 }

@@ -26,11 +26,14 @@ class HistoryItem {
 
   factory HistoryItem.fromJson(Map<dynamic, dynamic> json) {
     return HistoryItem(
-      id: json['id'] as String,
-      calculator: json['calculator'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      inputs: Map<String, dynamic>.from(json['inputs'] as Map),
-      results: Map<String, dynamic>.from(json['results'] as Map),
+      id: (json['id'] ?? DateTime.now().microsecondsSinceEpoch.toString())
+          .toString(),
+      calculator: (json['calculator'] ?? 'Unknown').toString(),
+      createdAt:
+          DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
+          DateTime.now(),
+      inputs: Map<String, dynamic>.from(json['inputs'] ?? {}),
+      results: Map<String, dynamic>.from(json['results'] ?? {}),
     );
   }
 }
