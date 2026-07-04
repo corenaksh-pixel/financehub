@@ -45,25 +45,16 @@ class CalculatorPage extends StatelessWidget {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(title),
-        ),
+        appBar: AppBar(title: Text(title)),
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                CalculatorHeader(
-                  title: title,
-                  subtitle: subtitle,
-                  icon: icon,
-                ),
+                CalculatorHeader(title: title, subtitle: subtitle, icon: icon),
 
-                CalculatorSection(
-                  title: "Inputs",
-                  child: inputSection,
-                ),
+                CalculatorSection(title: "Inputs", child: inputSection),
 
                 CalculatorSection(
                   title: "Actions",
@@ -71,8 +62,6 @@ class CalculatorPage extends StatelessWidget {
                     onCalculate: onCalculate,
                     onReset: onReset,
                     onShare: onShare,
-                    onPdf: onPdf,
-                    enabled: enableActions,
                   ),
                 ),
 

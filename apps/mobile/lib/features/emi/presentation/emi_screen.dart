@@ -8,6 +8,9 @@ import 'package:financehub/shared/widgets/result_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:financehub/core/services/history_service.dart';
+import 'package:financehub/core/services/pdf_service.dart';
+import 'package:financehub/core/services/share_pdf_service.dart';
+import 'package:financehub/shared/widgets/calculator_scaffold.dart';
 
 class EmiScreen extends StatefulWidget {
   const EmiScreen({super.key});
@@ -143,6 +146,26 @@ class _EmiScreenState extends State<EmiScreen> {
     );
   }
 
+  Future<void> exportPdf() async {
+    if (emi == null) return;
+
+    final pdf = await PdfService.generateReport(
+      title: 'EMI Calculator Report',
+      results: {
+        'Loan Amount': currencyFormatter.format(
+          double.parse(_loanController.text),
+        ),
+        'Interest Rate': '${_interestController.text}%',
+        'Loan Tenure': '${_tenureController.text} Years',
+        'Monthly EMI': currencyFormatter.format(emi!),
+        'Total Interest': currencyFormatter.format(totalInterest!),
+        'Total Payment': currencyFormatter.format(totalPayment!),
+      },
+    );
+
+    await SharePdfService.printPdf(pdf);
+  }
+
   @override
   void dispose() {
     _loanController.dispose();
@@ -153,100 +176,104 @@ class _EmiScreenState extends State<EmiScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("EMI Calculator")),
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              AppNumberField(
-                controller: _loanController,
-                label: "Loan Amount",
-                decimal: true,
-              ),
-
-              AppNumberField(
-                controller: _interestController,
-                label: "Interest Rate (%)",
-                decimal: true,
-              ),
-
-              AppNumberField(
-                controller: _tenureController,
-                label: "Loan Tenure (Years)",
-              ),
-
-              const SizedBox(height: 20),
-
-              FilledButton.icon(
-                onPressed: calculateEMI,
-                icon: const Icon(Icons.calculate),
-                label: const Text("Calculate EMI"),
-              ),
-
-              const SizedBox(height: 12),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: resetCalculator,
-                      icon: const Icon(Icons.refresh),
-                      label: const Text("Reset"),
-                    ),
-                  ),
-
-                  const SizedBox(width: 12),
-
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: emi == null ? null : shareResult,
-                      icon: const Icon(Icons.share),
-                      label: const Text("Share"),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 30),
-
-              if (emi != null) ...[
-                ResultCard(
-                  title: "Monthly EMI",
-                  value: currencyFormatter.format(emi!),
-                  icon: Icons.payments,
-                ),
-
-                ResultCard(
-                  title: "Total Interest",
-                  value: currencyFormatter.format(totalInterest!),
-                  icon: Icons.trending_up,
-                ),
-
-                ResultCard(
-                  title: "Total Payment",
-                  value: currencyFormatter.format(totalPayment!),
-                  icon: Icons.account_balance_wallet,
-                ),
-
-                const SizedBox(height: 24),
-
-                EmiPieChart(
-                  principal: double.parse(_loanController.text),
-                  interest: totalInterest!,
-                ),
-
-                const SizedBox(height: 24),
-
-                AmortizationTable(schedule: schedule),
-              ],
-            ],
-          ),
+    return CalculatorScaffold(
+      title: "EMI Calculator",
+      children: [
+        AppNumberField(
+          controller: _loanController,
+          label: "Loan Amount",
+          decimal: true,
         ),
-      ),
+
+        AppNumberField(
+          controller: _interestController,
+          label: "Interest Rate (%)",
+          decimal: true,
+        ),
+
+        AppNumberField(
+          controller: _tenureController,
+          label: "Loan Tenure (Years)",
+        ),
+
+        const SizedBox(height: 20),
+
+        FilledButton.icon(
+          onPressed: calculateEMI,
+          icon: const Icon(Icons.calculate),
+          label: const Text("Calculate EMI"),
+        ),
+
+        const SizedBox(height: 12),
+
+        Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: resetCalculator,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text("Reset"),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: emi == null ? null : shareResult,
+                    icon: const Icon(Icons.share),
+                    label: const Text("Share"),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: emi == null ? null : exportPdf,
+                icon: const Icon(Icons.picture_as_pdf),
+                label: const Text("Export PDF"),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 30),
+
+        if (emi != null) ...[
+          ResultCard(
+            title: "Monthly EMI",
+            value: currencyFormatter.format(emi!),
+            icon: Icons.payments,
+          ),
+
+          ResultCard(
+            title: "Total Interest",
+            value: currencyFormatter.format(totalInterest!),
+            icon: Icons.trending_up,
+          ),
+
+          ResultCard(
+            title: "Total Payment",
+            value: currencyFormatter.format(totalPayment!),
+            icon: Icons.account_balance_wallet,
+          ),
+
+          const SizedBox(height: 24),
+
+          EmiPieChart(
+            principal: double.parse(_loanController.text),
+            interest: totalInterest!,
+          ),
+
+          const SizedBox(height: 24),
+
+          AmortizationTable(schedule: schedule),
+        ],
+      ],
     );
   }
 }

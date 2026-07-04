@@ -1,18 +1,48 @@
+import 'package:financehub/core/navigation/app_page_route.dart';
+import 'package:financehub/features/calculators/domain/calculator_catalog.dart';
+import 'package:financehub/features/favorites/data/favorites_repository.dart';
+import 'package:financehub/features/history/data/history_repository.dart';
+import 'package:financehub/features/home/presentation/widgets/dashboard/dashboard_header.dart';
+import 'package:financehub/features/home/presentation/widgets/dashboard/finance_tip_card.dart';
+import 'package:financehub/features/home/presentation/widgets/dashboard/quick_actions.dart';
+import 'package:financehub/features/home/presentation/widgets/recent_calculations_widget.dart';
 import 'package:financehub/features/home/providers/dashboard_provider.dart';
+import 'package:financehub/features/home/widgets/category_section.dart';
+import 'package:financehub/features/search/presentation/search_screen.dart';
 import 'package:financehub/shared/widgets/calculator_card.dart';
 import 'package:financehub/shared/widgets/stat_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:financehub/features/home/presentation/widgets/recent_calculations_widget.dart';
-import 'package:financehub/features/calculators/domain/calculator_catalog.dart';
-import 'package:financehub/features/home/widgets/category_section.dart';
-import 'package:financehub/features/search/presentation/search_screen.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    HistoryRepository.refresh.addListener(_refreshDashboard);
+    FavoritesRepository.refresh.addListener(_refreshDashboard);
+  }
+
+  @override
+  void dispose() {
+    HistoryRepository.refresh.removeListener(_refreshDashboard);
+    FavoritesRepository.refresh.removeListener(_refreshDashboard);
+    super.dispose();
+  }
+
+ void _refreshDashboard() {
+  ref.read(dashboardProvider.notifier).refresh();
+}
+
+  @override
+  Widget build(BuildContext context) {
     final stats = ref.watch(dashboardProvider);
 
     return Scaffold(
@@ -22,17 +52,7 @@ class HomeScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "👋 Good Evening",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-              ),
-
-              const SizedBox(height: 8),
-
-              const Text(
-                "Pratik",
-                style: TextStyle(fontSize: 18, color: Colors.grey),
-              ),
+              const DashboardHeader(),
 
               const SizedBox(height: 24),
 
@@ -41,7 +61,7 @@ class HomeScreen extends ConsumerWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const SearchScreen()),
+                    AppPageRoute(page: const SearchScreen()),
                   );
                 },
                 child: IgnorePointer(
@@ -57,11 +77,18 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
 
+              const SizedBox(height: 24),
+
+              const QuickActions(),
+
               const SizedBox(height: 30),
 
               const Text(
                 "⭐ Popular Calculators",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
 
               const SizedBox(height: 16),
@@ -69,15 +96,16 @@ class HomeScreen extends ConsumerWidget {
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                itemCount: CalculatorCatalog.popular.length,
+                gridDelegate:
+                    const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
                   childAspectRatio: 0.75,
                 ),
-                itemCount: CalculatorCatalog.calculators.length,
                 itemBuilder: (context, index) {
-                  final calculator = CalculatorCatalog.calculators[index];
+                  final calculator = CalculatorCatalog.popular[index];
 
                   return CalculatorCard(
                     id: calculator.id,
@@ -87,17 +115,21 @@ class HomeScreen extends ConsumerWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => calculator.screen),
+                        AppPageRoute(page: calculator.screen),
                       );
                     },
                   );
                 },
               ),
+
               const SizedBox(height: 30),
 
               const Text(
                 "📂 Categories",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
 
               const SizedBox(height: 16),
@@ -108,29 +140,38 @@ class HomeScreen extends ConsumerWidget {
 
               const Text(
                 "📊 Quick Overview",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
 
               const SizedBox(height: 16),
 
               Row(
                 children: [
-                  StatCard(
-                    icon: Icons.calculate,
-                    title: "Calculators",
-                    value: CalculatorCatalog.calculators.length.toString(),
+                  Expanded(
+                    child: StatCard(
+                      icon: Icons.calculate,
+                      title: "Calculators",
+                      value: stats.calculators.toString(),
+                    ),
                   ),
                   const SizedBox(width: 12),
-                  StatCard(
-                    icon: Icons.favorite,
-                    title: "Favorites",
-                    value: stats.favorites.toString(),
+                  Expanded(
+                    child: StatCard(
+                      icon: Icons.favorite,
+                      title: "Favorites",
+                      value: stats.favorites.toString(),
+                    ),
                   ),
                   const SizedBox(width: 12),
-                  StatCard(
-                    icon: Icons.history,
-                    title: "Recent",
-                    value: stats.recent.toString(),
+                  Expanded(
+                    child: StatCard(
+                      icon: Icons.history,
+                      title: "Recent",
+                      value: stats.recent.toString(),
+                    ),
                   ),
                 ],
               ),
@@ -139,12 +180,21 @@ class HomeScreen extends ConsumerWidget {
 
               const Text(
                 "🕒 Recent Calculations",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
 
               const SizedBox(height: 16),
 
               const RecentCalculationsWidget(),
+
+              const SizedBox(height: 30),
+
+              const FinanceTipCard(),
+
+              const SizedBox(height: 40),
             ],
           ),
         ),

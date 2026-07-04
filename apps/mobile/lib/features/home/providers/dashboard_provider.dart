@@ -1,21 +1,29 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:financehub/core/services/history_service.dart';
+import 'package:financehub/features/calculators/domain/calculator_catalog.dart';
+import 'package:financehub/features/favorites/data/favorites_repository.dart';
+import 'package:financehub/features/home/domain/dashboard_stats.dart';
 
-class DashboardStats {
-  final int calculators;
-  final int favorites;
-  final int recent;
+class DashboardNotifier extends Notifier<DashboardStats> {
+  @override
+  DashboardStats build() {
+    return _createStats();
+  }
 
-  const DashboardStats({
-    required this.calculators,
-    required this.favorites,
-    required this.recent,
-  });
+  DashboardStats _createStats() {
+    return DashboardStats(
+      calculators: CalculatorCatalog.calculators.length,
+      favorites: FavoritesRepository.getAll().length,
+      recent: HistoryService.getAll().length,
+    );
+  }
+
+  void refresh() {
+    state = _createStats();
+  }
 }
 
-final dashboardProvider = Provider<DashboardStats>((ref) {
-  return const DashboardStats(
-    calculators: 24,
-    favorites: 6,
-    recent: 12,
-  );
-});
+final dashboardProvider =
+    NotifierProvider<DashboardNotifier, DashboardStats>(
+  DashboardNotifier.new,
+);

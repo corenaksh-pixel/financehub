@@ -24,11 +24,11 @@ class HistoryService {
     return HistoryRepository.getAll();
   }
 
-  static Future<void> delete(int index) {
-    return HistoryRepository.delete(index);
+  static Future<void> delete(int index) async {
+    await HistoryRepository.delete(index);
   }
 
-  static Future<void> clear() {
-    return HistoryRepository.clear();
+  static Future<void> clear() async {
+    await HistoryRepository.clear();
   }
 }

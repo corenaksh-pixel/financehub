@@ -1,9 +1,36 @@
 import 'package:financehub/core/services/history_service.dart';
+import 'package:financehub/features/history/data/history_repository.dart';
+import 'package:financehub/features/history/presentation/history_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class RecentCalculationsWidget extends StatelessWidget {
+class RecentCalculationsWidget extends StatefulWidget {
   const RecentCalculationsWidget({super.key});
+
+  @override
+  State<RecentCalculationsWidget> createState() =>
+      _RecentCalculationsWidgetState();
+}
+
+class _RecentCalculationsWidgetState
+    extends State<RecentCalculationsWidget> {
+  @override
+  void initState() {
+    super.initState();
+    HistoryRepository.refresh.addListener(_reload);
+  }
+
+  @override
+  void dispose() {
+    HistoryRepository.refresh.removeListener(_reload);
+    super.dispose();
+  }
+
+  void _reload() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +46,8 @@ class RecentCalculationsWidget extends StatelessWidget {
       );
     }
 
-    final recent = history.reversed.take(3).toList();
+    // HistoryRepository.getAll() already returns newest first
+    final recent = history.take(3).toList();
 
     return Column(
       children: recent.map((item) {
@@ -30,17 +58,13 @@ class RecentCalculationsWidget extends StatelessWidget {
           child: Card(
             child: ListTile(
               leading: CircleAvatar(
-                child: Text(
-                  item.calculator.substring(0, 1),
-                ),
+                child: Text(item.calculator.substring(0, 1)),
               ),
               title: Text(item.calculator),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '${firstResult.key}: ${firstResult.value}',
-                  ),
+                  Text('${firstResult.key}: ${firstResult.value}'),
                   const SizedBox(height: 4),
                   Text(
                     DateFormat(
@@ -50,6 +74,14 @@ class RecentCalculationsWidget extends StatelessWidget {
                 ],
               ),
               trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => HistoryDetailScreen(item: item),
+                  ),
+                );
+              },
             ),
           ),
         );

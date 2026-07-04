@@ -2,10 +2,10 @@ import 'package:financehub/features/favorites/data/favorites_repository.dart';
 import 'package:flutter/material.dart';
 
 class CalculatorCard extends StatefulWidget {
-  final IconData icon;
   final String id;
+  final IconData icon;
   final String title;
-  final String? subtitle;
+  final String subtitle;
   final VoidCallback? onTap;
 
   const CalculatorCard({
@@ -13,7 +13,7 @@ class CalculatorCard extends StatefulWidget {
     required this.id,
     required this.icon,
     required this.title,
-    this.subtitle,
+    required this.subtitle,
     this.onTap,
   });
 
@@ -22,72 +22,79 @@ class CalculatorCard extends StatefulWidget {
 }
 
 class _CalculatorCardState extends State<CalculatorCard> {
-  late bool favorite;
-
   @override
   void initState() {
     super.initState();
-    favorite = FavoritesRepository.isFavorite(widget.id);
+    FavoritesRepository.refresh.addListener(_refresh);
   }
 
-  Future<void> toggleFavorite() async {
-    await FavoritesRepository.toggle(widget.id);
+  @override
+  void dispose() {
+    FavoritesRepository.refresh.removeListener(_refresh);
+    super.dispose();
+  }
 
-    setState(() {
-      favorite = FavoritesRepository.isFavorite(widget.id);
-    });
+  void _refresh() {
+    if (mounted) setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    final favorite = FavoritesRepository.isFavorite(widget.id);
+
     return Card(
-      elevation: 3,
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
       child: InkWell(
         onTap: widget.onTap,
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(12),
           child: Column(
             children: [
               Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                   icon: Icon(
-                    favorite ? Icons.star : Icons.star_border,
-                    color: Colors.amber,
+                    favorite ? Icons.favorite : Icons.favorite_border,
+                    color: favorite ? Colors.red : Colors.grey,
                   ),
-                  onPressed: toggleFavorite,
+                  onPressed: () async {
+                    await FavoritesRepository.toggle(widget.id);
+                  },
                 ),
               ),
 
+              const Spacer(),
+
               CircleAvatar(
-                radius: 20,
-                child: Icon(widget.icon),
+                radius: 24,
+                child: Icon(widget.icon, size: 26),
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
 
               Text(
                 widget.title,
                 textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
               ),
 
-              if (widget.subtitle != null) ...[
-                const SizedBox(height: 6),
-                Text(
-                  widget.subtitle!,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 12,
-                  ),
-                ),
-              ],
+              const SizedBox(height: 4),
+
+              Text(
+                widget.subtitle,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+
+              const Spacer(),
             ],
           ),
         ),

@@ -1,73 +1,171 @@
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 
 class PdfService {
-  const PdfService._();
-
-  static Future<void> generateReport({
+  static Future<pw.Document> generateReport({
     required String title,
-    required Map<String, String> data,
-    String footer = 'Generated using FinanceHub',
+    Map<String, String>? results,
+    Map<String, String>? data,
   }) async {
+    final values = results ?? data ?? {};
+
+    final regularFont = pw.Font.ttf(
+      await rootBundle.load('assets/fonts/NotoSans-Regular.ttf'),
+    );
+
+    final boldFont = pw.Font.ttf(
+      await rootBundle.load('assets/fonts/NotoSans-Bold.ttf'),
+    );
+
     final pdf = pw.Document();
 
     pdf.addPage(
       pw.MultiPage(
-        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(30),
+        theme: pw.ThemeData.withFont(
+          base: regularFont,
+          bold: boldFont,
+        ),
         build: (context) => [
-          pw.Header(
-            level: 0,
-            child: pw.Text(
-              title,
-              style: pw.TextStyle(
-                fontSize: 24,
-                fontWeight: pw.FontWeight.bold,
-              ),
+          pw.Container(
+            padding: const pw.EdgeInsets.all(18),
+            decoration: pw.BoxDecoration(
+              color: PdfColors.blue50,
+              border: pw.Border.all(color: PdfColors.blue300),
+              borderRadius: pw.BorderRadius.circular(8),
             ),
-          ),
-
-          pw.SizedBox(height: 20),
-
-          pw.Table(
-            border: pw.TableBorder.all(),
-            children: data.entries
-                .map(
-                  (entry) => pw.TableRow(
-                    children: [
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8),
-                        child: pw.Text(
-                          entry.key,
-                          style: pw.TextStyle(
-                            fontWeight: pw.FontWeight.bold,
-                          ),
-                        ),
+            child: pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      'FinanceHub',
+                      style: pw.TextStyle(
+                        font: boldFont,
+                        fontSize: 24,
                       ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8),
-                        child: pw.Text(entry.value),
+                    ),
+                    pw.SizedBox(height: 4),
+                    pw.Text(
+                      'Smart Finance Calculator',
+                      style: pw.TextStyle(
+                        font: regularFont,
+                        fontSize: 11,
                       ),
-                    ],
-                  ),
-                )
-                .toList(),
+                    ),
+                  ],
+                ),
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.end,
+                  children: [
+                    pw.Text(
+                      'Generated',
+                      style: pw.TextStyle(font: boldFont),
+                    ),
+                    pw.Text(
+                      DateFormat(
+                        'dd MMM yyyy • hh:mm a',
+                      ).format(DateTime.now()),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
 
           pw.SizedBox(height: 24),
 
           pw.Text(
-            footer,
-            style: const pw.TextStyle(
-              color: PdfColors.grey,
+            title,
+            style: pw.TextStyle(
+              font: boldFont,
+              fontSize: 20,
+            ),
+          ),
+
+          pw.SizedBox(height: 18),
+
+          pw.Table(
+            border: pw.TableBorder.all(
+              color: PdfColors.grey400,
+            ),
+            columnWidths: const {
+              0: pw.FlexColumnWidth(2),
+              1: pw.FlexColumnWidth(2),
+            },
+            children: [
+              pw.TableRow(
+                decoration: const pw.BoxDecoration(
+                  color: PdfColors.blue100,
+                ),
+                children: [
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(10),
+                    child: pw.Text(
+                      "Field",
+                      style: pw.TextStyle(font: boldFont),
+                    ),
+                  ),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(10),
+                    child: pw.Text(
+                      "Value",
+                      style: pw.TextStyle(font: boldFont),
+                    ),
+                  ),
+                ],
+              ),
+
+              ...values.entries.map(
+                (entry) => pw.TableRow(
+                  children: [
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(10),
+                      child: pw.Text(entry.key),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(10),
+                      child: pw.Text(entry.value),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          pw.SizedBox(height: 30),
+
+          pw.Divider(),
+
+          pw.Center(
+            child: pw.Text(
+              'Generated by FinanceHub',
+              style: pw.TextStyle(
+                font: boldFont,
+                color: PdfColors.grey700,
+              ),
+            ),
+          ),
+
+          pw.SizedBox(height: 6),
+
+          pw.Center(
+            child: pw.Text(
+              '© 2026 CoreNaksh Technologies',
+              style: const pw.TextStyle(
+                fontSize: 10,
+                color: PdfColors.grey600,
+              ),
             ),
           ),
         ],
       ),
     );
 
-    await Printing.layoutPdf(
-      onLayout: (_) async => pdf.save(),
-    );
+    return pdf;
   }
 }

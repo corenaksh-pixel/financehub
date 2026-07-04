@@ -3,6 +3,7 @@ import 'package:financehub/features/history/domain/history_item.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'history_detail_screen.dart';
+import 'package:financehub/shared/widgets/empty_state.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -46,7 +47,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ],
       ),
       body: history.isEmpty
-          ? const Center(child: Text('No calculations yet'))
+          ? const EmptyState(
+              icon: Icons.history,
+              title: 'No History Yet',
+              subtitle: 'Your calculations will appear here.',
+            )
           : ListView.builder(
               itemCount: history.length,
               itemBuilder: (context, index) {
@@ -76,6 +81,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       ],
                     ),
                     onTap: () {
+                      print("History tapped");
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(

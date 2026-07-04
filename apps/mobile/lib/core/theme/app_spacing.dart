@@ -1,15 +1,10 @@
-import 'package:flutter/material.dart';
-
 class AppSpacing {
   AppSpacing._();
 
-  static const xs = SizedBox(height: 4);
-  static const sm = SizedBox(height: 8);
-  static const md = SizedBox(height: 16);
-  static const lg = SizedBox(height: 24);
-  static const xl = SizedBox(height: 32);
-
-  static const horizontalPadding = EdgeInsets.symmetric(horizontal: 20);
-
-  static const screenPadding = EdgeInsets.all(20);
+  static const xs = 4.0;
+  static const sm = 8.0;
+  static const md = 16.0;
+  static const lg = 24.0;
+  static const xl = 32.0;
+  static const xxl = 40.0;
 }

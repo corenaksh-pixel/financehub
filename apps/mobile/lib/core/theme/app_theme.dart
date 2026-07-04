@@ -1,58 +1,42 @@
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
 
 class AppTheme {
-  AppTheme._();
+  static const seed = Color(0xFF1565C0);
 
-  static ThemeData get lightTheme {
-    return ThemeData(
-      useMaterial3: true,
-      scaffoldBackgroundColor: AppColors.background,
-
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.primary,
+  static final ThemeData lightTheme = ThemeData(
+    useMaterial3: true,
+    colorSchemeSeed: seed,
+    brightness: Brightness.light,
+    scaffoldBackgroundColor: const Color(0xFFF7F8FC),
+    appBarTheme: const AppBarTheme(centerTitle: true),
+    cardTheme: CardThemeData(
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
       ),
-
-      appBarTheme: const AppBarTheme(
-        elevation: 0,
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.textPrimary,
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
       ),
+    ),
+  );
 
-      filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          minimumSize: const Size(double.infinity, 56),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
+  static final ThemeData darkTheme = ThemeData(
+    useMaterial3: true,
+    colorSchemeSeed: seed,
+    brightness: Brightness.dark,
+    appBarTheme: const AppBarTheme(centerTitle: true),
+    cardTheme: CardThemeData(
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
       ),
-
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: Colors.white,
-
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
-
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
-
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
       ),
-
-      cardTheme: CardThemeData(
-        elevation: 2,
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-        ),
-      ),
-    );
-  }
+    ),
+  );
 }
