@@ -31,4 +31,14 @@ class HistoryService {
   static Future<void> clear() async {
     await HistoryRepository.clear();
   }
+
+  static int get count => HistoryRepository.getAll().length;
+
+  static bool get isEmpty => HistoryRepository.getAll().isEmpty;
+
+  static HistoryItem? latest() {
+    final list = HistoryRepository.getAll();
+    if (list.isEmpty) return null;
+    return list.first;
+  }
 }

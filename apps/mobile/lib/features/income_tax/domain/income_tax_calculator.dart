@@ -1,16 +1,23 @@
-import 'tax_engine.dart';
-import 'tax_regime.dart';
 import 'tax_result.dart';
 
 class IncomeTaxCalculator {
-  const IncomeTaxCalculator._();
-
   static TaxResult calculate({
     required double annualIncome,
   }) {
-    return TaxEngine.calculate(
+    return TaxResult(
       grossIncome: annualIncome,
-      regime: TaxRegime.newRegime,
+      standardDeduction: 0,
+      taxableIncome: annualIncome,
+      slabTax: 0,
+      rebate: 0,
+      surcharge: 0,
+      cess: 0,
+      totalTax: 0,
+      monthlyTax: 0,
+      takeHome: annualIncome,
+      effectiveTaxRate: 0,
+      breakdown: const [],
+      explanations: const [],
     );
   }
 }

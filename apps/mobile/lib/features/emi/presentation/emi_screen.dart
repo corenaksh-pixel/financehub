@@ -101,6 +101,7 @@ class _EmiScreenState extends State<EmiScreen> {
       },
     );
   }
+  
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();

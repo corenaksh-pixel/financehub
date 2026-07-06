@@ -1,0 +1,4 @@
+enum TaxpayerType {
+  salaried,
+  nonSalaried,
+}
