@@ -9,7 +9,7 @@ class SlabCalculator {
     required double taxableIncome,
     required List<TaxSlab> slabs,
   }) {
-    var totalTax = 0.0;
+    double totalTax = 0;
     final breakdown = <TaxBreakdown>[];
 
     for (final slab in slabs) {
@@ -17,14 +17,14 @@ class SlabCalculator {
         break;
       }
 
-      final upperLimit = taxableIncome < slab.to ? taxableIncome : slab.to;
+      final upperLimit =
+          slab.to == double.infinity ? taxableIncome : slab.to;
 
       final taxableAmount =
-          (taxableIncome < upperLimit ? taxableIncome : upperLimit) - slab.from;
+          (taxableIncome < upperLimit ? taxableIncome : upperLimit) -
+          slab.from;
 
-      if (taxableAmount <= 0) {
-        continue;
-      }
+      if (taxableAmount <= 0) continue;
 
       final tax = taxableAmount * slab.rate;
 
@@ -32,8 +32,9 @@ class SlabCalculator {
 
       breakdown.add(
         TaxBreakdown(
-          slab:
-              '₹${slab.from.toStringAsFixed(0)} - ₹${upperLimit.toStringAsFixed(0)}',
+          slab: slab.to == double.infinity
+              ? 'Above ₹${slab.from.toStringAsFixed(0)}'
+              : '₹${slab.from.toStringAsFixed(0)} - ₹${slab.to.toStringAsFixed(0)}',
           rate: slab.rate,
           taxableAmount: taxableAmount,
           tax: tax,
@@ -41,6 +42,9 @@ class SlabCalculator {
       );
     }
 
-    return SlabCalculationResult(slabTax: totalTax, breakdown: breakdown);
+    return SlabCalculationResult(
+      slabTax: totalTax,
+      breakdown: breakdown,
+    );
   }
 }

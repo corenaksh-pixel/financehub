@@ -1,4 +1,3 @@
-import 'package:financehub/core/services/pdf_service.dart';
 import 'package:financehub/core/services/share_service.dart';
 import 'package:financehub/features/income_tax/domain/income_tax_calculator.dart';
 import 'package:financehub/features/income_tax/domain/tax_result.dart';
@@ -11,6 +10,9 @@ import 'package:financehub/core/services/history_service.dart';
 import '../domain/tax_inputs.dart';
 import '../domain/financial_year.dart';
 import '../domain/taxpayer_type.dart';
+import 'package:financehub/core/pdf/pdf_export_service.dart';
+import 'package:financehub/features/income_tax/pdf/income_tax_pdf.dart';
+import 'package:financehub/shared/widgets/summary_card.dart';
 
 class IncomeTaxScreen extends StatefulWidget {
   const IncomeTaxScreen({super.key});
@@ -94,16 +96,11 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
   Future<void> exportPdf() async {
     if (result == null) return;
 
-    await PdfService.generateReport(
-      title: 'FinanceHub Income Tax Report',
-      data: {
-        'Gross Income': formatter.format(result!.grossIncome),
-        'Taxable Income': formatter.format(result!.taxableIncome),
-        'Income Tax': formatter.format(result!.totalTax),
-        'Cess': formatter.format(result!.cess),
-        'Total Tax': formatter.format(result!.totalTax),
-      },
-    );
+    final document = await IncomeTaxPdf.build(result: result!);
+
+    const exporter = PdfExportService();
+
+    await exporter.shareDocument(document);
   }
 
   @override
@@ -192,30 +189,14 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
               const SizedBox(height: 30),
 
               if (result != null) ...[
-                ResultCard(
-                  title: 'Gross Income',
-                  value: formatter.format(result!.grossIncome),
-                  icon: Icons.account_balance_wallet,
+                SummaryCard(
+                  annualIncome: formatter.format(result!.grossIncome),
+                  totalTax: formatter.format(result!.totalTax),
+                  annualTakeHome: formatter.format(result!.takeHome),
+                  monthlyTakeHome: formatter.format(result!.takeHome / 12),
                 ),
 
-                ResultCard(
-                  title: 'Standard Deduction',
-                  value: formatter.format(result!.standardDeduction),
-                  icon: Icons.remove_circle_outline,
-                ),
-
-                ResultCard(
-                  title: 'Taxable Income',
-                  value: formatter.format(result!.taxableIncome),
-                  icon: Icons.payments,
-                ),
-
-                ResultCard(
-                  title: 'Income Tax',
-                  value: formatter.format(result!.totalTax),
-                  icon: Icons.receipt_long,
-                ),
-
+                const SizedBox(height: 20),
                 ResultCard(
                   title: 'Health & Education Cess',
                   value: formatter.format(result!.cess),
@@ -226,6 +207,24 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
                   title: 'Total Tax',
                   value: formatter.format(result!.totalTax),
                   icon: Icons.account_balance,
+                ),
+
+                ResultCard(
+                  title: 'Annual Take Home',
+                  value: formatter.format(result!.takeHome),
+                  icon: Icons.account_balance_wallet,
+                ),
+
+                ResultCard(
+                  title: 'Monthly Tax',
+                  value: formatter.format(result!.monthlyTax),
+                  icon: Icons.calendar_today,
+                ),
+
+                ResultCard(
+                  title: 'Monthly Take Home',
+                  value: formatter.format(result!.takeHome / 12),
+                  icon: Icons.payments,
                 ),
 
                 ResultCard(
