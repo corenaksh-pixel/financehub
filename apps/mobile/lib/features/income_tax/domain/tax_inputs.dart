@@ -2,15 +2,13 @@ import 'financial_year.dart';
 import 'taxpayer_type.dart';
 
 class TaxInputs {
+  final double annualIncome;
   final FinancialYear financialYear;
   final TaxpayerType taxpayerType;
 
-  /// Gross annual income before any deductions.
-  final double annualIncome;
-
   const TaxInputs({
+    required this.annualIncome,
     required this.financialYear,
     required this.taxpayerType,
-    required this.annualIncome,
   });
 }

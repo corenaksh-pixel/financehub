@@ -8,6 +8,9 @@ import 'package:financehub/shared/widgets/result_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:financehub/core/services/history_service.dart';
+import '../domain/tax_inputs.dart';
+import '../domain/financial_year.dart';
+import '../domain/taxpayer_type.dart';
 
 class IncomeTaxScreen extends StatefulWidget {
   const IncomeTaxScreen({super.key});
@@ -40,7 +43,13 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
     }
 
     setState(() {
-      result = IncomeTaxCalculator.calculate(annualIncome: income);
+      result = IncomeTaxCalculator.calculate(
+        input: TaxInputs(
+          annualIncome: income,
+          financialYear: FinancialYear.fy2026_27,
+          taxpayerType: TaxpayerType.salaried,
+        ),
+      );
     });
 
     await HistoryService.save(
@@ -50,7 +59,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
         'Gross Income': result!.grossIncome,
         'Standard Deduction': result!.standardDeduction,
         'Taxable Income': result!.taxableIncome,
-        'Income Tax': result!.incomeTax,
+        'Income Tax': result!.totalTax,
         'Health & Education Cess': result!.cess,
         'Total Tax': result!.totalTax,
         'Effective Tax Rate': '${result!.effectiveTaxRate.toStringAsFixed(2)}%',
@@ -75,7 +84,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
       data: {
         'Gross Income': formatter.format(result!.grossIncome),
         'Taxable Income': formatter.format(result!.taxableIncome),
-        'Income Tax': formatter.format(result!.incomeTax),
+        'Income Tax': formatter.format(result!.totalTax),
         'Cess': formatter.format(result!.cess),
         'Total Tax': formatter.format(result!.totalTax),
       },
@@ -90,7 +99,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
       data: {
         'Gross Income': formatter.format(result!.grossIncome),
         'Taxable Income': formatter.format(result!.taxableIncome),
-        'Income Tax': formatter.format(result!.incomeTax),
+        'Income Tax': formatter.format(result!.totalTax),
         'Cess': formatter.format(result!.cess),
         'Total Tax': formatter.format(result!.totalTax),
       },
@@ -203,7 +212,7 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
 
                 ResultCard(
                   title: 'Income Tax',
-                  value: formatter.format(result!.incomeTax),
+                  value: formatter.format(result!.totalTax),
                   icon: Icons.receipt_long,
                 ),
 
