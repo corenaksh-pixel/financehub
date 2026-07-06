@@ -1,4 +1,7 @@
 import '../data/tax_repository.dart';
+import 'calculators/cess_calculator.dart';
+import 'calculators/rebate_calculator.dart';
+import 'calculators/slab_calculator.dart';
 import 'tax_inputs.dart';
 import 'tax_result.dart';
 import 'tax_validator.dart';
@@ -7,9 +10,20 @@ import 'taxpayer_type.dart';
 class TaxEngine {
   TaxEngine({
     TaxRepository? repository,
-  }) : _repository = repository ?? const TaxRepository();
+    SlabCalculator? slabCalculator,
+    RebateCalculator? rebateCalculator,
+    CessCalculator? cessCalculator,
+  })  : _repository = repository ?? const TaxRepository(),
+        _slabCalculator = slabCalculator ?? const SlabCalculator(),
+        _rebateCalculator =
+            rebateCalculator ?? const RebateCalculator(),
+        _cessCalculator =
+            cessCalculator ?? const CessCalculator();
 
   final TaxRepository _repository;
+  final SlabCalculator _slabCalculator;
+  final RebateCalculator _rebateCalculator;
+  final CessCalculator _cessCalculator;
 
   final _validator = const TaxValidator();
 
@@ -20,37 +34,57 @@ class TaxEngine {
       input.financialYear,
     );
 
-    // Standard deduction
     final standardDeduction =
         input.taxpayerType == TaxpayerType.salaried
             ? config.standardDeduction
             : 0.0;
 
-    // Taxable income
     final taxableIncome =
         (input.annualIncome - standardDeduction)
             .clamp(0.0, double.infinity);
 
-    // TODO:
-    // Slab Tax
-    // Rebate
-    // Surcharge
-    // Marginal Relief
-    // Cess
+    final slabResult = _slabCalculator.calculate(
+      taxableIncome: taxableIncome,
+      slabs: config.slabs,
+    );
+
+    final rebate = _rebateCalculator.calculate(
+      slabTax: slabResult.slabTax,
+      taxableIncome: taxableIncome,
+      rebateLimit: config.rebateLimit,
+      maximumRebate: config.maximumRebate,
+    );
+
+    final taxAfterRebate =
+        slabResult.slabTax - rebate;
+
+    const surcharge = 0.0;
+
+    final cess = _cessCalculator.calculate(
+      taxAfterRebate: taxAfterRebate,
+      surcharge: surcharge,
+      cessRate: config.cessRate,
+    );
+
+    final totalTax =
+        taxAfterRebate + surcharge + cess;
 
     return TaxResult(
       grossIncome: input.annualIncome,
       standardDeduction: standardDeduction,
       taxableIncome: taxableIncome,
-      slabTax: 0,
-      rebate: 0,
-      surcharge: 0,
-      cess: 0,
-      totalTax: 0,
-      monthlyTax: 0,
-      takeHome: input.annualIncome,
-      effectiveTaxRate: 0,
-      breakdown: const [],
+      slabTax: slabResult.slabTax,
+      rebate: rebate,
+      surcharge: surcharge,
+      cess: cess,
+      totalTax: totalTax,
+      monthlyTax: totalTax / 12,
+      takeHome: input.annualIncome - totalTax,
+      effectiveTaxRate:
+          input.annualIncome == 0
+              ? 0
+              : (totalTax / input.annualIncome) * 100,
+      breakdown: slabResult.breakdown,
       explanations: const [],
     );
   }
