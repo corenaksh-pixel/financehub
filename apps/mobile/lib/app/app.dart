@@ -1,8 +1,8 @@
 import 'package:financehub/core/theme/app_theme.dart';
 import 'package:financehub/features/settings/providers/theme_provider.dart';
-import 'package:financehub/navigation/main_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:financehub/features/splash/presentation/splash_screen.dart';
 
 class FinanceHubApp extends ConsumerWidget {
   const FinanceHubApp({super.key});
@@ -13,11 +13,11 @@ class FinanceHubApp extends ConsumerWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'FinanceHub',
+      title: 'CoreNaksh Finance',
       themeMode: themeMode,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      home: const MainNavigation(),
+      home: const SplashScreen(),
     );
   }
 }

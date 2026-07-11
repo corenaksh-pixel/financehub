@@ -2,8 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:financehub/core/services/history_service.dart';
 import 'package:financehub/features/history/domain/history_item.dart';
 
-final historyProvider =
-    NotifierProvider<HistoryNotifier, List<HistoryItem>>(HistoryNotifier.new);
+final historyProvider = NotifierProvider<HistoryNotifier, List<HistoryItem>>(
+  HistoryNotifier.new,
+);
 
 class HistoryNotifier extends Notifier<List<HistoryItem>> {
   @override
@@ -20,8 +21,11 @@ class HistoryNotifier extends Notifier<List<HistoryItem>> {
     refresh();
   }
 
-  Future<void> delete(int index) async {
-    await HistoryService.delete(index);
-    refresh();
+  Future<void> deleteById(String id) async {
+    // Remove immediately from UI
+    state = state.where((item) => item.id != id).toList();
+
+    // Delete from Hive
+    await HistoryService.deleteById(id);
   }
 }

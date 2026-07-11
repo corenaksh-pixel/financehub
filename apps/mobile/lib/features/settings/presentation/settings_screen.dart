@@ -3,20 +3,19 @@ import 'package:financehub/features/settings/presentation/widgets/profile_card.d
 import 'package:financehub/features/settings/presentation/widgets/settings_group.dart';
 import 'package:financehub/features/settings/presentation/widgets/settings_tile.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:financehub/core/services/history_service.dart';
 import 'package:financehub/features/settings/presentation/privacy_policy_screen.dart';
 import 'package:financehub/features/settings/presentation/terms_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:financehub/features/settings/providers/theme_provider.dart';
+import 'package:financehub/features/settings/presentation/about_screen.dart';
+import 'package:financehub/features/settings/presentation/contact_us_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  ConsumerState<SettingsScreen> createState() =>
-      _SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
@@ -88,16 +87,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           SettingsGroup(
             title: "General",
             children: [
-              SwitchListTile(
-                value: notifications,
-                onChanged: (value) {
-                  setState(() {
-                    notifications = value;
-                  });
-                },
-                secondary: const Icon(Icons.notifications),
-                title: const Text("Notifications"),
-              ),
               SettingsTile(
                 icon: Icons.share,
                 title: "Share App",
@@ -107,17 +96,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   SharePlus.instance.share(
                     ShareParams(
                       text: '''
-FinanceHub
+CoreNaksh Finance
 
-Your all-in-one finance calculator.
+Smart Finance. Better Future.
 
+✓ Income Tax Calculator
+✓ GST Calculator
 ✓ EMI Calculator
 ✓ SIP Calculator
-✓ GST Calculator
-✓ Income Tax Calculator
-✓ FD / RD / PPF
+✓ FD Calculator
+✓ RD Calculator
+✓ PPF Calculator
+✓ Loan Calculator
+✓ Currency Converter
 
-Coming soon on Play Store & App Store.
+Developed by CoreNaksh Technologies.
+
+Support:
+corenaksh.tech@gmail.com
 ''',
                       sharePositionOrigin:
                           box.localToGlobal(Offset.zero) & box.size,
@@ -128,7 +124,15 @@ Coming soon on Play Store & App Store.
               SettingsTile(
                 icon: Icons.star_rate,
                 title: "Rate App",
-                onTap: () {},
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        "Rate App will be available after the Play Store release.",
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -141,36 +145,23 @@ Coming soon on Play Store & App Store.
               SettingsTile(
                 icon: Icons.email,
                 title: "Contact Us",
-                subtitle: "support@corenaksh.com",
-                onTap: () async {
-                  final uri = Uri(
-                    scheme: 'mailto',
-                    path: 'support@corenaksh.com',
-                    queryParameters: {'subject': 'FinanceHub Support'},
+                subtitle: "corenaksh.tech@gmail.com",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ContactUsScreen()),
                   );
-
-                  await launchUrl(uri);
                 },
               ),
               SettingsTile(
                 icon: Icons.info_outline,
-                title: "About FinanceHub",
+                title: "About",
                 onTap: () async {
-                  final info = await PackageInfo.fromPlatform();
-
                   if (!context.mounted) return;
 
-                  showAboutDialog(
-                    context: context,
-                    applicationName: "FinanceHub",
-                    applicationVersion: '${info.version} (${info.buildNumber})',
-                    applicationLegalese: "© 2026 CoreNaksh Technologies",
-                    children: const [
-                      SizedBox(height: 12),
-                      Text(
-                        "FinanceHub is an all-in-one finance calculator designed to help users make smarter financial decisions.",
-                      ),
-                    ],
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AboutScreen()),
                   );
                 },
               ),
@@ -251,6 +242,24 @@ Coming soon on Play Store & App Store.
           ),
 
           const SizedBox(height: 30),
+          const Center(
+            child: Column(
+              children: [
+                Text(
+                  "CoreNaksh Finance",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 4),
+                Text("Version 1.0.0", style: TextStyle(color: Colors.grey)),
+                SizedBox(height: 4),
+                Text(
+                  "© 2026 CoreNaksh Technologies",
+                  style: TextStyle(color: Colors.grey),
+                ),
+                SizedBox(height: 20),
+              ],
+            ),
+          ),
         ],
       ),
     );

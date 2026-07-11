@@ -3,6 +3,7 @@ import 'package:financehub/features/calculators/presentation/calculators_screen.
 import 'package:financehub/features/favorites/presentation/favorites_screen.dart';
 import 'package:financehub/features/home/presentation/home_screen.dart';
 import 'package:financehub/features/settings/presentation/settings_screen.dart';
+import 'package:financehub/features/history/presentation/history_screen.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -18,6 +19,7 @@ class _MainNavigationState extends State<MainNavigation> {
     HomeScreen(),
     CalculatorsScreen(),
     FavoritesScreen(),
+    HistoryScreen(),
     SettingsScreen(),
   ];
 
@@ -56,6 +58,13 @@ class _MainNavigationState extends State<MainNavigation> {
             icon: Icon(Icons.favorite_border),
             selectedIcon: Icon(Icons.favorite),
             label: 'Favorites',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.history_outlined),
+
+            selectedIcon: Icon(Icons.history),
+
+            label: 'History',
           ),
           NavigationDestination(
             icon: Icon(Icons.settings_outlined),

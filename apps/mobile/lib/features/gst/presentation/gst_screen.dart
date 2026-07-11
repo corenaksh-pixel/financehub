@@ -16,8 +16,9 @@ class GstScreen extends StatefulWidget {
 
 class _GstScreenState extends State<GstScreen> {
   final _amountController = TextEditingController();
-  final _gstController = TextEditingController(text: "18");
-
+  double gstRate = 18;
+  double? cgst;
+  double? sgst;
   final NumberFormat formatter = NumberFormat.currency(
     locale: "en_IN",
     symbol: "₹ ",
@@ -34,17 +35,13 @@ class _GstScreenState extends State<GstScreen> {
     FocusScope.of(context).unfocus();
 
     final amount = double.tryParse(_amountController.text.trim());
-    final gst = double.tryParse(_gstController.text.trim());
 
     if (amount == null || amount <= 0) {
       _showError("Please enter a valid amount.");
       return;
     }
 
-    if (gst == null || gst < 0 || gst > 100) {
-      _showError("Please enter a valid GST percentage.");
-      return;
-    }
+    final gst = gstRate;
 
     final result = GstCalculator.calculate(
       amount: amount,
@@ -56,6 +53,9 @@ class _GstScreenState extends State<GstScreen> {
       baseAmount = result["baseAmount"];
       gstAmount = result["gstAmount"];
       finalAmount = result["finalAmount"];
+
+      cgst = gstAmount! / 2;
+      sgst = gstAmount! / 2;
     });
     await HistoryService.save(
       calculator: 'GST',
@@ -66,7 +66,10 @@ class _GstScreenState extends State<GstScreen> {
       },
       results: {
         'Base Amount': baseAmount!,
+        'GST Rate': gstRate,
         'GST Amount': gstAmount!,
+        'CGST': cgst!,
+        'SGST': sgst!,
         'Final Amount': finalAmount!,
       },
     );
@@ -74,7 +77,9 @@ class _GstScreenState extends State<GstScreen> {
 
   void reset() {
     _amountController.clear();
-    _gstController.text = "18";
+    gstRate = 18;
+    cgst = null;
+    sgst = null;
 
     setState(() {
       baseAmount = null;
@@ -89,10 +94,20 @@ class _GstScreenState extends State<GstScreen> {
 
     await ShareService.share(
       context: context,
-      title: "FinanceHub GST Calculation",
+      title: "CoreNaksh Finance GST Calculation",
       data: {
+        "Mode": isAddGst ? "Add GST" : "Remove GST",
+
+        "GST Rate": "${gstRate.toStringAsFixed(0)}%",
+
         "Base Amount": formatter.format(baseAmount!),
+
         "GST Amount": formatter.format(gstAmount!),
+
+        "CGST": formatter.format(cgst!),
+
+        "SGST": formatter.format(sgst!),
+
         "Final Amount": formatter.format(finalAmount!),
       },
     );
@@ -102,10 +117,14 @@ class _GstScreenState extends State<GstScreen> {
     if (baseAmount == null) return;
 
     await PdfService.generateReport(
-      title: "FinanceHub GST Report",
+      title: "CoreNaksh Finance GST Report",
       data: {
+        "Mode": isAddGst ? "Add GST" : "Remove GST",
+        "GST Rate": "${gstRate.toStringAsFixed(0)}%",
         "Base Amount": formatter.format(baseAmount!),
         "GST Amount": formatter.format(gstAmount!),
+        "CGST": formatter.format(cgst!),
+        "SGST": formatter.format(sgst!),
         "Final Amount": formatter.format(finalAmount!),
       },
     );
@@ -120,14 +139,13 @@ class _GstScreenState extends State<GstScreen> {
   @override
   void dispose() {
     _amountController.dispose();
-    _gstController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("GST Calculator")),
+      appBar: AppBar(title: const Text("GST Calculator"), centerTitle: true),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: SingleChildScrollView(
@@ -141,13 +159,30 @@ class _GstScreenState extends State<GstScreen> {
                 decimal: true,
               ),
 
-              AppNumberField(
-                controller: _gstController,
-                label: "GST %",
-                decimal: true,
+              const SizedBox(height: 16),
+              DropdownButtonFormField<double>(
+                initialValue: gstRate,
+                decoration: const InputDecoration(
+                  labelText: 'GST Rate',
+                  border: OutlineInputBorder(),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 3, child: Text('3%')),
+                  DropdownMenuItem(value: 5, child: Text('5%')),
+                  DropdownMenuItem(value: 12, child: Text('12%')),
+                  DropdownMenuItem(value: 18, child: Text('18%')),
+                  DropdownMenuItem(value: 28, child: Text('28%')),
+                ],
+                onChanged: (value) {
+                  if (value == null) return;
+
+                  setState(() {
+                    gstRate = value;
+                  });
+                },
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 16),
 
               SegmentedButton<bool>(
                 segments: const [
@@ -214,19 +249,49 @@ class _GstScreenState extends State<GstScreen> {
 
               const SizedBox(height: 30),
 
-              if (baseAmount != null) ...[
+              if (baseAmount == null) ...[
+                const Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: Column(
+                      children: [
+                        Icon(Icons.receipt_long, size: 56, color: Colors.grey),
+                        SizedBox(height: 12),
+                        Text(
+                          "Enter amount, select GST rate and tap Calculate.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ] else ...[
                 ResultCard(
                   title: "Base Amount",
                   value: formatter.format(baseAmount!),
                   icon: Icons.account_balance_wallet,
                 ),
-
+                ResultCard(
+                  title: "GST Rate",
+                  value: "${gstRate.toStringAsFixed(0)} %",
+                  icon: Icons.percent,
+                ),
                 ResultCard(
                   title: "GST Amount",
                   value: formatter.format(gstAmount!),
                   icon: Icons.receipt_long,
                 ),
-
+                ResultCard(
+                  title: "CGST",
+                  value: formatter.format(cgst!),
+                  icon: Icons.account_balance,
+                ),
+                ResultCard(
+                  title: "SGST",
+                  value: formatter.format(sgst!),
+                  icon: Icons.account_balance,
+                ),
                 ResultCard(
                   title: "Final Amount",
                   value: formatter.format(finalAmount!),

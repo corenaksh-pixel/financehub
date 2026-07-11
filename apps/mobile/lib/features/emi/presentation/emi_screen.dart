@@ -133,7 +133,7 @@ class _EmiScreenState extends State<EmiScreen> {
 
     await ShareService.share(
       context: context,
-      title: 'FinanceHub EMI Calculation',
+      title: 'CoreNaksh Finance EMI Calculation',
       data: {
         'Loan Amount': currencyFormatter.format(
           double.parse(_loanController.text),

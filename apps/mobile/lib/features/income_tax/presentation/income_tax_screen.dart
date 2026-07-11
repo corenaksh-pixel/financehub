@@ -24,6 +24,9 @@ class IncomeTaxScreen extends StatefulWidget {
 class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
   final _incomeController = TextEditingController();
 
+  FinancialYear _financialYear = FinancialYear.fy2026_27;
+  TaxpayerType _taxpayerType = TaxpayerType.salaried;
+
   final formatter = NumberFormat.currency(
     locale: 'en_IN',
     symbol: '₹ ',
@@ -48,15 +51,23 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
       result = IncomeTaxCalculator.calculate(
         input: TaxInputs(
           annualIncome: income,
-          financialYear: FinancialYear.fy2026_27,
-          taxpayerType: TaxpayerType.salaried,
+          financialYear: _financialYear,
+          taxpayerType: _taxpayerType,
         ),
       );
     });
 
     await HistoryService.save(
       calculator: 'Income Tax',
-      inputs: {'Annual Income': income, 'Tax Regime': 'New Regime FY 2026-27'},
+      inputs: {
+        'Annual Income': income,
+        'Financial Year': _financialYear == FinancialYear.fy2025_26
+            ? 'FY 2025-26'
+            : 'FY 2026-27',
+        'Taxpayer Type': _taxpayerType == TaxpayerType.salaried
+            ? 'Salaried'
+            : 'Non-Salaried',
+      },
       results: {
         'Gross Income': result!.grossIncome,
         'Standard Deduction': result!.standardDeduction,
@@ -74,6 +85,8 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
 
     setState(() {
       result = null;
+      _financialYear = FinancialYear.fy2026_27;
+      _taxpayerType = TaxpayerType.salaried;
     });
   }
 
@@ -82,8 +95,14 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
 
     await ShareService.share(
       context: context,
-      title: 'FinanceHub Income Tax',
+      title: 'CoreNaksh Finance Income Tax',
       data: {
+        'Financial Year': _financialYear == FinancialYear.fy2025_26
+            ? 'FY 2025-26'
+            : 'FY 2026-27',
+        'Taxpayer Type': _taxpayerType == TaxpayerType.salaried
+            ? 'Salaried'
+            : 'Non-Salaried',
         'Gross Income': formatter.format(result!.grossIncome),
         'Taxable Income': formatter.format(result!.taxableIncome),
         'Income Tax': formatter.format(result!.totalTax),
@@ -110,10 +129,12 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Income Tax Calculator')),
+      appBar: AppBar(
+        title: const Text('Income Tax Calculator'),
+        centerTitle: true,
+      ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: SingleChildScrollView(
@@ -126,22 +147,58 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
                 label: 'Annual Income',
                 decimal: true,
               ),
+              const SizedBox(height: 16),
 
-              const SizedBox(height: 20),
-
-              DropdownButtonFormField<String>(
-                initialValue: 'New Regime FY 2026-27',
+              DropdownButtonFormField<FinancialYear>(
+                initialValue: _financialYear,
                 decoration: const InputDecoration(
-                  labelText: 'Tax Regime',
+                  labelText: 'Financial Year',
                   border: OutlineInputBorder(),
                 ),
                 items: const [
                   DropdownMenuItem(
-                    value: 'New Regime FY 2026-27',
-                    child: Text('New Regime FY 2026-27'),
+                    value: FinancialYear.fy2025_26,
+                    child: Text('FY 2025-26'),
+                  ),
+                  DropdownMenuItem(
+                    value: FinancialYear.fy2026_27,
+                    child: Text('FY 2026-27'),
                   ),
                 ],
-                onChanged: (_) {},
+                onChanged: (value) {
+                  if (value == null) return;
+
+                  setState(() {
+                    _financialYear = value;
+                  });
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              DropdownButtonFormField<TaxpayerType>(
+                initialValue: _taxpayerType,
+                decoration: const InputDecoration(
+                  labelText: 'Taxpayer Type',
+                  border: OutlineInputBorder(),
+                ),
+                items: const [
+                  DropdownMenuItem(
+                    value: TaxpayerType.salaried,
+                    child: Text('Salaried'),
+                  ),
+                  DropdownMenuItem(
+                    value: TaxpayerType.nonSalaried,
+                    child: Text('Non-Salaried'),
+                  ),
+                ],
+                onChanged: (value) {
+                  if (value == null) return;
+
+                  setState(() {
+                    _taxpayerType = value;
+                  });
+                },
               ),
 
               const SizedBox(height: 24),
@@ -188,7 +245,107 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
 
               const SizedBox(height: 30),
 
-              if (result != null) ...[
+              if (result == null)
+                Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(28),
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 38,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primaryContainer,
+                          child: Icon(
+                            Icons.account_balance,
+                            size: 42,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        const Text(
+                          "Income Tax Calculator",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        Text(
+                          "Calculate your income tax instantly using the latest Indian income tax slabs.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 15, color: Colors.grey),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        const Divider(),
+
+                        const SizedBox(height: 18),
+
+                        const Row(
+                          children: [
+                            Icon(Icons.check_circle_outline),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Text("Supports FY 2025-26 & FY 2026-27"),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        const Row(
+                          children: [
+                            Icon(Icons.check_circle_outline),
+                            SizedBox(width: 12),
+                            Expanded(child: Text("Salaried & Non-Salaried")),
+                          ],
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        const Row(
+                          children: [
+                            Icon(Icons.check_circle_outline),
+                            SizedBox(width: 12),
+                            Expanded(child: Text("Detailed Tax Breakdown")),
+                          ],
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        const Row(
+                          children: [
+                            Icon(Icons.check_circle_outline),
+                            SizedBox(width: 12),
+                            Expanded(child: Text("Share & Export PDF")),
+                          ],
+                        ),
+
+                        SizedBox(height: 22),
+
+                        Text(
+                          "Enter your annual income above and tap Calculate.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else ...[
                 SummaryCard(
                   annualIncome: formatter.format(result!.grossIncome),
                   totalTax: formatter.format(result!.totalTax),
@@ -196,7 +353,24 @@ class _IncomeTaxScreenState extends State<IncomeTaxScreen> {
                   monthlyTakeHome: formatter.format(result!.takeHome / 12),
                 ),
 
+                ResultCard(
+                  title: 'Financial Year',
+                  value: _financialYear == FinancialYear.fy2025_26
+                      ? 'FY 2025-26'
+                      : 'FY 2026-27',
+                  icon: Icons.calendar_month,
+                ),
+
+                ResultCard(
+                  title: 'Taxpayer Type',
+                  value: _taxpayerType == TaxpayerType.salaried
+                      ? 'Salaried'
+                      : 'Non-Salaried',
+                  icon: Icons.person,
+                ),
+
                 const SizedBox(height: 20),
+
                 ResultCard(
                   title: 'Health & Education Cess',
                   value: formatter.format(result!.cess),

@@ -94,7 +94,7 @@ class _PpfScreenState extends State<PpfScreen> {
 
     await ShareService.share(
       context: context,
-      title: 'FinanceHub PPF Calculation',
+      title: 'CoreNaksh Finance PPF Calculation',
       data: {
         'Yearly Investment': formatter.format(
           double.parse(_investmentController.text),
@@ -110,7 +110,7 @@ class _PpfScreenState extends State<PpfScreen> {
     if (maturity == null) return;
 
     await PdfService.generateReport(
-      title: 'FinanceHub PPF Report',
+      title: 'CoreNaksh Finance PPF Report',
       data: {
         'Yearly Investment': formatter.format(
           double.parse(_investmentController.text),

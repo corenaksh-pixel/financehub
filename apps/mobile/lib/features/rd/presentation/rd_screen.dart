@@ -107,7 +107,7 @@ class _RdScreenState extends State<RdScreen> {
 
     await ShareService.share(
       context: context,
-      title: 'FinanceHub RD Calculation',
+      title: 'CoreNaksh Finance RD Calculation',
       data: {
         'Monthly Deposit': formatter.format(
           double.parse(_depositController.text),
@@ -123,7 +123,7 @@ class _RdScreenState extends State<RdScreen> {
     if (maturity == null) return;
 
     await PdfService.generateReport(
-      title: 'FinanceHub RD Report',
+      title: 'CoreNaksh Finance RD Report',
       data: {
         'Monthly Deposit': formatter.format(
           double.parse(_depositController.text),

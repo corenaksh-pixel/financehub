@@ -25,5 +25,5 @@ class DashboardNotifier extends Notifier<DashboardStats> {
 
 final dashboardProvider =
     NotifierProvider<DashboardNotifier, DashboardStats>(
-  DashboardNotifier.new,
-);
+      DashboardNotifier.new,
+    );

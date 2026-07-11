@@ -24,8 +24,8 @@ class HistoryService {
     return HistoryRepository.getAll();
   }
 
-  static Future<void> delete(int index) async {
-    await HistoryRepository.delete(index);
+  static Future<void> deleteById(String id) async {
+    await HistoryRepository.deleteById(id);
   }
 
   static Future<void> clear() async {

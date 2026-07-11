@@ -94,7 +94,7 @@ class _SipScreenState extends State<SipScreen> {
 
     await ShareService.share(
       context: context,
-      title: 'FinanceHub SIP Calculation',
+      title: 'CoreNaksh Finance SIP Calculation',
       data: {
         'Monthly Investment': formatter.format(
           double.parse(_investmentController.text),
@@ -112,7 +112,7 @@ class _SipScreenState extends State<SipScreen> {
     if (maturityValue == null) return;
 
     await PdfService.generateReport(
-      title: 'FinanceHub SIP Report',
+      title: 'CoreNaksh Finance SIP Report',
       data: {
         'Monthly Investment': formatter.format(
           double.parse(_investmentController.text),
@@ -149,7 +149,7 @@ class _SipScreenState extends State<SipScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("SIP Calculator")),
+      appBar: AppBar(title: const Text("SIP Calculator"), centerTitle: true),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: SingleChildScrollView(
@@ -163,11 +163,15 @@ class _SipScreenState extends State<SipScreen> {
                 decimal: true,
               ),
 
+              const SizedBox(height: 16),
+
               AppNumberField(
                 controller: _returnController,
                 label: "Expected Annual Return (%)",
                 decimal: true,
               ),
+
+              const SizedBox(height: 16),
 
               AppNumberField(
                 controller: _yearsController,
@@ -218,19 +222,98 @@ class _SipScreenState extends State<SipScreen> {
 
               const SizedBox(height: 30),
 
-              if (maturityValue != null) ...[
+              if (maturityValue == null)
+                Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(28),
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 38,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primaryContainer,
+                          child: Icon(
+                            Icons.savings,
+                            size: 42,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          "SIP Calculator",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          "Estimate your wealth by investing monthly using the power of compounding.",
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        Divider(),
+                        const SizedBox(height: 18),
+                        const Row(
+                          children: [
+                            Icon(Icons.check_circle_outline),
+                            SizedBox(width: 12),
+                            Expanded(child: Text("Monthly SIP Investment")),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        const Row(
+                          children: [
+                            Icon(Icons.check_circle_outline),
+                            SizedBox(width: 12),
+                            Expanded(child: Text("Expected Annual Return")),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        const Row(
+                          children: [
+                            Icon(Icons.check_circle_outline),
+                            SizedBox(width: 12),
+                            Expanded(child: Text("Investment Period")),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        const Row(
+                          children: [
+                            Icon(Icons.check_circle_outline),
+                            SizedBox(width: 12),
+                            Expanded(child: Text("Share & Export PDF")),
+                          ],
+                        ),
+                        const SizedBox(height: 22),
+                        Text(
+                          "Enter the details above and tap Calculate.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else ...[
                 ResultCard(
                   title: "Total Invested",
                   value: formatter.format(investedAmount!),
                   icon: Icons.savings,
                 ),
-
                 ResultCard(
                   title: "Estimated Returns",
                   value: formatter.format(estimatedReturns!),
                   icon: Icons.trending_up,
                 ),
-
                 ResultCard(
                   title: "Maturity Value",
                   value: formatter.format(maturityValue!),

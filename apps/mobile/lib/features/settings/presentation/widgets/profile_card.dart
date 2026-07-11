@@ -20,7 +20,7 @@ class ProfileCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "FinanceHub",
+                    "CoreNaksh Finance",
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,

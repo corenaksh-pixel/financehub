@@ -1,4 +1,4 @@
-# financehub
+# CoreNaksh Finance
 
 A new Flutter project.
 

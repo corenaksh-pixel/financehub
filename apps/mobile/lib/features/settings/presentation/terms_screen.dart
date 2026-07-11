@@ -13,13 +13,13 @@ class TermsScreen extends StatelessWidget {
         padding: EdgeInsets.all(20),
         child: Text(
           '''
-FinanceHub Terms
+CoreNaksh Finance Terms
 
-FinanceHub provides financial calculations for informational purposes only.
+CoreNaksh Finance provides financial calculations for informational purposes only.
 
 Users should verify results before making financial decisions.
 
-FinanceHub is not a financial advisor.
+CoreNaksh Finance is not a financial advisor.
 
 © 2026 CoreNaksh Technologies
 ''',

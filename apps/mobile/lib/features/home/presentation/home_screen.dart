@@ -1,7 +1,5 @@
 import 'package:financehub/core/navigation/app_page_route.dart';
 import 'package:financehub/features/calculators/domain/calculator_catalog.dart';
-import 'package:financehub/features/favorites/data/favorites_repository.dart';
-import 'package:financehub/features/history/data/history_repository.dart';
 import 'package:financehub/features/home/presentation/widgets/dashboard/dashboard_header.dart';
 import 'package:financehub/features/home/presentation/widgets/dashboard/finance_tip_card.dart';
 import 'package:financehub/features/home/presentation/widgets/dashboard/quick_actions.dart';
@@ -13,6 +11,8 @@ import 'package:financehub/shared/widgets/calculator_card.dart';
 import 'package:financehub/shared/widgets/stat_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:financehub/features/history/data/history_repository.dart';
+import 'package:financehub/features/favorites/data/favorites_repository.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -37,9 +37,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
- void _refreshDashboard() {
-  ref.read(dashboardProvider.notifier).refresh();
-}
+  void _refreshDashboard() {
+    ref.read(dashboardProvider.notifier).refresh();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,10 +85,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
               const Text(
                 "⭐ Popular Calculators",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 16),
@@ -97,8 +94,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: CalculatorCatalog.popular.length,
-                gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
@@ -126,10 +122,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
               const Text(
                 "📂 Categories",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 16),
@@ -140,10 +133,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
               const Text(
                 "📊 Quick Overview",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 16),
@@ -180,15 +170,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
               const Text(
                 "🕒 Recent Calculations",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 16),
 
-              const RecentCalculationsWidget(),
+              RecentCalculationsWidget(),
 
               const SizedBox(height: 30),
 

@@ -106,7 +106,7 @@ class _FdScreenState extends State<FdScreen> {
 
     await ShareService.share(
       context: context,
-      title: "FinanceHub FD Calculation",
+      title: "CoreNaksh Finance FD Calculation",
       data: {
         "Deposit": formatter.format(principal!),
         "Interest": formatter.format(interest!),
@@ -119,7 +119,7 @@ class _FdScreenState extends State<FdScreen> {
     if (maturity == null) return;
 
     await PdfService.generateReport(
-      title: "FinanceHub FD Report",
+      title: "CoreNaksh Finance FD Report",
       data: {
         "Deposit": formatter.format(principal!),
         "Interest": formatter.format(interest!),

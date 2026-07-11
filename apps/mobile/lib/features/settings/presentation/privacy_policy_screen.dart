@@ -13,9 +13,9 @@ class PrivacyPolicyScreen extends StatelessWidget {
         padding: EdgeInsets.all(20),
         child: Text(
           '''
-FinanceHub Privacy Policy
+CoreNaksh Finance Privacy Policy
 
-FinanceHub stores your calculation history and favorites locally on your device.
+CoreNaksh Finance stores your calculation history and favorites locally on your device.
 
 We do not collect personal financial information.
 

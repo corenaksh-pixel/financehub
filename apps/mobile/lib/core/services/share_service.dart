@@ -8,7 +8,7 @@ class ShareService {
     required BuildContext context,
     required String title,
     required Map<String, String> data,
-    String footer = 'Generated using FinanceHub',
+    String footer = 'Generated using CoreNaksh Finance',
   }) async {
     final buffer = StringBuffer();
 
