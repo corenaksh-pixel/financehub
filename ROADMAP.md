@@ -1,4 +1,4 @@
-# FinanceHub Roadmap
+# CoreNaksh Finance Roadmap
 
 ## Phase 1 - Core Calculators
 

@@ -3,7 +3,6 @@ import 'package:financehub/features/settings/presentation/widgets/profile_card.d
 import 'package:financehub/features/settings/presentation/widgets/settings_group.dart';
 import 'package:financehub/features/settings/presentation/widgets/settings_tile.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:financehub/core/services/history_service.dart';
 import 'package:financehub/features/settings/presentation/privacy_policy_screen.dart';
 import 'package:financehub/features/settings/presentation/terms_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -199,47 +198,6 @@ corenaksh.tech@gmail.com
           ),
 
           const SizedBox(height: 20),
-
-          SettingsGroup(
-            title: "Storage",
-            children: [
-              SettingsTile(
-                icon: Icons.delete_outline,
-                title: "Clear History",
-                onTap: () async {
-                  final confirm = await showDialog<bool>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text("Clear History"),
-                      content: const Text(
-                        "Are you sure you want to delete all calculation history?",
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, false),
-                          child: const Text("Cancel"),
-                        ),
-                        FilledButton(
-                          onPressed: () => Navigator.pop(context, true),
-                          child: const Text("Delete"),
-                        ),
-                      ],
-                    ),
-                  );
-
-                  if (confirm == true) {
-                    await HistoryService.clear();
-
-                    if (!context.mounted) return;
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("History cleared")),
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
 
           const SizedBox(height: 30),
           const Center(

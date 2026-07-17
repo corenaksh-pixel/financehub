@@ -1,8 +1,8 @@
-# 💰 FinanceHub
+# 💰 CoreNaksh Finance
 
 > A modern, production-ready personal finance application built with Flutter.
 
-FinanceHub is an all-in-one financial toolkit designed to help users calculate, plan, and manage their finances with accuracy and simplicity.
+CoreNaksh Finance is an all-in-one financial toolkit designed to help users calculate, plan, and manage their finances with accuracy and simplicity.
 
 ---
 
@@ -76,7 +76,7 @@ FinanceHub is an all-in-one financial toolkit designed to help users calculate, 
 
 # 🏗 Architecture
 
-FinanceHub follows Clean Architecture with feature-first organization.
+CoreNaksh Finance follows Clean Architecture with feature-first organization.
 
 ```
 lib/
@@ -183,7 +183,7 @@ flutter run
 
 # 🎯 Vision
 
-FinanceHub aims to become a complete personal finance platform, providing:
+CoreNaksh Finance aims to become a complete personal finance platform, providing:
 
 - Financial Calculators
 - Tax Planning

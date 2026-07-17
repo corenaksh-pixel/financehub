@@ -6,15 +6,17 @@ import 'package:financehub/shared/widgets/result_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:financehub/core/services/history_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:financehub/features/history/providers/history_provider.dart';
 
-class PpfScreen extends StatefulWidget {
+class PpfScreen extends ConsumerStatefulWidget {
   const PpfScreen({super.key});
 
   @override
-  State<PpfScreen> createState() => _PpfScreenState();
+  ConsumerState<PpfScreen> createState() => _PpfScreenState();
 }
 
-class _PpfScreenState extends State<PpfScreen> {
+class _PpfScreenState extends ConsumerState<PpfScreen> {
   final _investmentController = TextEditingController();
   final _rateController = TextEditingController(text: '7.1');
   final _yearsController = TextEditingController(text: '15');
@@ -37,16 +39,18 @@ class _PpfScreenState extends State<PpfScreen> {
     final years = int.tryParse(_yearsController.text.trim());
 
     if (investment == null || investment <= 0) {
+      _clearResults();
       _showError("Please enter a valid yearly investment.");
       return;
     }
-
     if (rate == null || rate < 0 || rate > 100) {
+      _clearResults();
       _showError("Please enter a valid interest rate.");
       return;
     }
 
     if (years == null || years <= 0) {
+      _clearResults();
       _showError("Please enter a valid investment period.");
       return;
     }
@@ -75,6 +79,7 @@ class _PpfScreenState extends State<PpfScreen> {
         'Maturity Amount': maturity!,
       },
     );
+    ref.read(historyProvider.notifier).refresh();
   }
 
   void resetCalculator() {
@@ -82,6 +87,14 @@ class _PpfScreenState extends State<PpfScreen> {
     _rateController.text = '7.1';
     _yearsController.text = '15';
 
+    setState(() {
+      invested = null;
+      interest = null;
+      maturity = null;
+    });
+  }
+
+  void _clearResults() {
     setState(() {
       invested = null;
       interest = null;

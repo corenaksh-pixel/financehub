@@ -6,15 +6,17 @@ import 'package:financehub/shared/widgets/result_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:financehub/core/services/history_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:financehub/features/history/providers/history_provider.dart';
 
-class RdScreen extends StatefulWidget {
+class RdScreen extends ConsumerStatefulWidget {
   const RdScreen({super.key});
 
   @override
-  State<RdScreen> createState() => _RdScreenState();
+  ConsumerState<RdScreen> createState() => _RdScreenState();
 }
 
-class _RdScreenState extends State<RdScreen> {
+class _RdScreenState extends ConsumerState<RdScreen> {
   final _depositController = TextEditingController();
   final _rateController = TextEditingController(text: '7.5');
   final _monthsController = TextEditingController();
@@ -24,15 +26,6 @@ class _RdScreenState extends State<RdScreen> {
     symbol: '₹ ',
     decimalDigits: 2,
   );
-
-  final Map<String, int> compoundingOptions = {
-    'Monthly': 12,
-    'Quarterly': 4,
-    'Half-Yearly': 2,
-    'Yearly': 1,
-  };
-
-  String selectedCompounding = 'Monthly';
 
   double? invested;
   double? interest;
@@ -46,16 +39,19 @@ class _RdScreenState extends State<RdScreen> {
     final months = int.tryParse(_monthsController.text.trim());
 
     if (deposit == null || deposit <= 0) {
+      _clearResults();
       _showError("Please enter a valid monthly deposit.");
       return;
     }
 
     if (rate == null || rate < 0 || rate > 100) {
+      _clearResults();
       _showError("Please enter a valid interest rate.");
       return;
     }
 
     if (months == null || months <= 0) {
+      _clearResults();
       _showError("Please enter a valid tenure.");
       return;
     }
@@ -64,7 +60,7 @@ class _RdScreenState extends State<RdScreen> {
       monthlyDeposit: deposit,
       annualRate: rate,
       months: months,
-      compoundsPerYear: compoundingOptions[selectedCompounding]!,
+      compoundsPerYear: 4, // Quarterly
     );
 
     setState(() {
@@ -79,14 +75,15 @@ class _RdScreenState extends State<RdScreen> {
         'Monthly Deposit': deposit,
         'Interest Rate (%)': rate,
         'Tenure (Months)': months,
-        'Compounding': selectedCompounding,
       },
+
       results: {
         'Total Investment': invested!,
         'Interest Earned': interest!,
         'Maturity Amount': maturity!,
       },
     );
+    ref.read(historyProvider.notifier).refresh();
   }
 
   void resetCalculator() {
@@ -98,7 +95,14 @@ class _RdScreenState extends State<RdScreen> {
       invested = null;
       interest = null;
       maturity = null;
-      selectedCompounding = 'Monthly';
+    });
+  }
+
+  void _clearResults() {
+    setState(() {
+      invested = null;
+      interest = null;
+      maturity = null;
     });
   }
 
@@ -181,24 +185,6 @@ class _RdScreenState extends State<RdScreen> {
               AppNumberField(
                 controller: _monthsController,
                 label: "Tenure (Months)",
-              ),
-
-              const SizedBox(height: 20),
-
-              DropdownButtonFormField<String>(
-                initialValue: selectedCompounding,
-                decoration: const InputDecoration(
-                  labelText: "Compounding",
-                  border: OutlineInputBorder(),
-                ),
-                items: compoundingOptions.keys.map((value) {
-                  return DropdownMenuItem(value: value, child: Text(value));
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedCompounding = value!;
-                  });
-                },
               ),
 
               const SizedBox(height: 24),

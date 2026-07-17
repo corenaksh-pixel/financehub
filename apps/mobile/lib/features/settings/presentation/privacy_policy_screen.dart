@@ -22,7 +22,7 @@ We do not collect personal financial information.
 No financial information is uploaded to our servers.
 
 For support:
-support@corenaksh.com
+corenaksh.tech@gmail.com
 
 © 2026 CoreNaksh Technologies
 ''',
